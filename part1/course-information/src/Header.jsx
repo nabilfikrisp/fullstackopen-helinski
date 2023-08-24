@@ -1,5 +1,6 @@
 const Header = (props) => {
-  return <div>Header</div>;
+  console.log(props);
+  return <h1>{props.course}</h1>;
 };
 
 Header.propTypes = {};

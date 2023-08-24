@@ -1,4 +1,4 @@
-const Total = () => {
+const Total = (props) => {
   return <div>Total</div>;
 };
 

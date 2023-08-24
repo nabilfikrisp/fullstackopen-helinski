@@ -1,5 +1,5 @@
 import Part from "./Part";
-const Content = () => {
+const Content = (props) => {
   return (
     <div>
       <Part />
