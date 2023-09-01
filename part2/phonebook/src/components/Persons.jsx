@@ -15,4 +15,4 @@ const Persons = ({ array, deletePerson }) => {
   );
 };
 
-export default Persons;
+export default Persons; 

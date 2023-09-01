@@ -4,13 +4,13 @@ import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import axios from "axios";
 import personApi from "./api/person.api";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
 
   useEffect(() => {
     axios.get("http://localhost:3001/persons").then((response) => {
-      console.log(response.data, "promise fulfilled");
       setPersons(response.data);
     });
   }, []);
@@ -18,6 +18,8 @@ const App = () => {
   const [newPerson, setNewPerson] = useState({ name: "", number: "" });
   const [query, setQuery] = useState("");
   const [filteredPerson, setFilteredPerson] = useState(persons);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isError, setIsError] = useState(false);
 
   const isDuplicate = (name) => {
     return persons.some((person) => person.name === name);
@@ -31,12 +33,14 @@ const App = () => {
     event.preventDefault();
 
     if (newPerson.name.trim() === "") {
-      alert("Please fill in the name.");
+      setIsError(true);
+      setErrorMessage("Please fill in the name.");
       return;
     }
 
     if (isDuplicateNumber(newPerson.number)) {
-      alert(`${newPerson.number} is already in the phonebook.`);
+      setIsError(true);
+      setErrorMessage(`${newPerson.number} is already in the phonebook.`);
       return;
     }
 
@@ -51,8 +55,6 @@ const App = () => {
         );
         const personToUpdate = persons[personToUpdateIdx];
         personApi.update(personToUpdate.id, newPerson).then((response) => {
-          alert(`successfully updated ${response.name}`);
-
           setPersons((prev) =>
             prev.map((person) =>
               person.id === response.id
@@ -69,6 +71,8 @@ const App = () => {
             )
           );
           setNewPerson({ name: "", number: "" });
+          setIsError(false);
+          setErrorMessage(`successfully updated ${response.name}`);
         });
       }
       return;
@@ -82,9 +86,12 @@ const App = () => {
         setPersons(updatedPersons);
         setFilteredPerson(updatedPersons);
         setNewPerson({ name: "", number: "" });
+        setIsError(false);
+        setErrorMessage(`successfully created ${newPerson.name}`);
       })
       .catch((error) => {
-        alert(error);
+        setIsError(true);
+        setErrorMessage(`${error}`);
       });
   };
 
@@ -110,20 +117,24 @@ const App = () => {
       // on server delete
       personApi
         .deleteById(id)
-        .then(() => {
+        .then((response) => {
           // on client delete
           const toDelete = new Set([id]);
           const newArray = persons.filter((obj) => !toDelete.has(obj.id));
           setPersons(newArray);
+          setIsError(false);
+          setErrorMessage(`${response}`);
         })
         .catch((error) => {
-          alert(error);
+          setIsError(true);
+          setErrorMessage(`${error}`);
         });
     }
   };
 
   return (
     <div>
+      <Notification message={errorMessage} isError={isError} />
       <h2>Phonebook</h2>
       <Filter value={query} onChange={handleQueryChange} />
       <PersonForm
