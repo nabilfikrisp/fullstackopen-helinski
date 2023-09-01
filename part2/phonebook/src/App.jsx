@@ -3,6 +3,7 @@ import Filter from "./components/Filter";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import axios from "axios";
+import personApi from "./api/person.api";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -22,6 +23,10 @@ const App = () => {
     return persons.some((person) => person.name === name);
   };
 
+  const isDuplicateNumber = (number) => {
+    return persons.some((person) => person.number === number);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -30,16 +35,57 @@ const App = () => {
       return;
     }
 
-    if (isDuplicate(newPerson.name)) {
-      alert(`${newPerson.name} is already in the phonebook.`);
+    if (isDuplicateNumber(newPerson.number)) {
+      alert(`${newPerson.number} is already in the phonebook.`);
       return;
     }
 
-    const updatedPersons = [...persons, { ...newPerson, id: Date.now() }];
+    if (isDuplicate(newPerson.name)) {
+      if (
+        window.confirm(
+          `${newPerson.name} is already on the list, replace the old number with the new one`
+        )
+      ) {
+        const personToUpdateIdx = persons.findIndex(
+          (person) => person.name === newPerson.name
+        );
+        const personToUpdate = persons[personToUpdateIdx];
+        personApi.update(personToUpdate.id, newPerson).then((response) => {
+          alert(`successfully updated ${response.name}`);
 
-    setPersons(updatedPersons);
-    setFilteredPerson(updatedPersons);
-    setNewPerson({ name: "", number: "" });
+          setPersons((prev) =>
+            prev.map((person) =>
+              person.id === response.id
+                ? { ...person, number: response.number }
+                : person
+            )
+          );
+
+          setFilteredPerson((prev) =>
+            prev.map((person) =>
+              person.id === response.id
+                ? { ...person, number: response.number }
+                : person
+            )
+          );
+          setNewPerson({ name: "", number: "" });
+        });
+      }
+      return;
+    }
+
+    personApi
+      .create(newPerson)
+      .then((response) => {
+        const updatedPersons = [...persons, { ...response }];
+
+        setPersons(updatedPersons);
+        setFilteredPerson(updatedPersons);
+        setNewPerson({ name: "", number: "" });
+      })
+      .catch((error) => {
+        alert(error);
+      });
   };
 
   const handleOnChange = (event) => {
@@ -59,6 +105,23 @@ const App = () => {
     setQuery(newQuery);
   };
 
+  const deletePerson = (id) => {
+    if (window.confirm(`delete person ${id}`)) {
+      // on server delete
+      personApi
+        .deleteById(id)
+        .then(() => {
+          // on client delete
+          const toDelete = new Set([id]);
+          const newArray = persons.filter((obj) => !toDelete.has(obj.id));
+          setPersons(newArray);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -69,7 +132,7 @@ const App = () => {
         newPerson={newPerson}
       />
       <h2>Numbers</h2>
-      <Persons array={filteredPerson} />
+      <Persons array={filteredPerson} deletePerson={deletePerson} />
     </div>
   );
 };
