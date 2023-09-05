@@ -1,24 +1,16 @@
-const person_controller = require("./controllers/personController");
+const express = require("express");
+const routes = require("./routes/index");
+const unknownEndpoint = require("./middlewares/unknownEndpoint");
+const morgan = require("./middlewares/customMorgan");
+const app = express();
 const PORT = 3001;
 
-const express = require("express");
-const app = express();
-
 app.use(express.json());
+app.use(morgan);
 
-app.get("/", (request, response) => {
-  response.send("<h1>Hello World!</h1>");
-});
+app.use("/", routes);
 
-app.get("/api/persons", person_controller.index);
-
-app.get("/api/persons/:id", person_controller.show);
-
-app.get("/api/info", person_controller.info);
-
-app.delete("/api/persons/:id", person_controller.delete);
-
-app.post("/api/persons", person_controller.create);
+app.use(unknownEndpoint);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

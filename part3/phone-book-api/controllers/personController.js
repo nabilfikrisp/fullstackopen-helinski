@@ -10,17 +10,21 @@ exports.show = (request, response) => {
   const id = Number(request.params.id);
   const person = persons.find((person) => person.id === id);
 
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
+  if (!person) {
+    return response
+      .status(404)
+      .json({
+        error: "person not found",
+      })
+      .end();
   }
+  return response.json(person);
 };
 
 exports.info = (request, response) => {
   const totalPerson = persons.length;
   const date = new Date();
-  response.send(
+  return response.send(
     `<h2>Phonebook has info for ${totalPerson} people</h2><br/><p>${date}</p>`
   );
 };
@@ -41,6 +45,24 @@ exports.create = (request, response) => {
     });
   }
 
+  if (!body.name) {
+    return response.status(400).json({
+      error: "name field missing",
+    });
+  }
+
+  if (!body.number) {
+    return response.status(400).json({
+      error: "number field missing",
+    });
+  }
+
+  if (isDuplicate(body.name)) {
+    return response.status(400).json({
+      error: "name already exsist",
+    });
+  }
+
   const newPerson = {
     name: body.name,
     number: body.number,
@@ -49,5 +71,11 @@ exports.create = (request, response) => {
 
   persons = [...persons, newPerson];
 
-  response.status(201).json(newPerson);
+  return response.status(201).json(newPerson);
+};
+
+const isDuplicate = (name) => {
+  return persons.some(
+    (person) => person.name.toLowerCase() === name.toLowerCase()
+  );
 };
