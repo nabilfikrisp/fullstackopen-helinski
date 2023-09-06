@@ -7,7 +7,6 @@ router.get("/info", personController.info);
 router.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
 });
-router.hea
 
 router.use("/api/persons", personRoutes);
 //roouter.use("/api/users", userRoutes)
