@@ -57,11 +57,11 @@ exports.create = (request, response) => {
     });
   }
 
-  if (Person.find({ name: body.name }) !== null) {
-    return response.status(400).json({
-      error: "name already exsist",
-    });
-  }
+  // if (Person.find({ name: body.name }) !== null) {
+  //   return response.status(400).json({
+  //     error: "name already exsist",
+  //   });
+  // }
 
   const person = new Person({
     name: body.name,
