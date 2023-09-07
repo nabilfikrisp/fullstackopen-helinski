@@ -9,14 +9,16 @@ exports.index = (request, response) => {
   });
 };
 
-exports.show = (request, response) => {
+exports.show = (request, response, next) => {
   Person.findById(request.params.id)
     .then((person) => {
-      return response.json(person);
+      if (person) {
+        return response.json(person);
+      } else {
+        return response.status(404).end();
+      }
     })
-    .catch((error) => {
-      return console.log("error on person controller:", error);
-    });
+    .catch((error) => next(error));
 };
 
 exports.info = (request, response) => {
@@ -29,11 +31,12 @@ exports.info = (request, response) => {
   });
 };
 
-exports.delete = (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
-
-  response.status(204).end();
+exports.delete = (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id)
+    .then((result) => {
+      return response.status(204).end();
+    })
+    .catch((error) => next(error));
 };
 
 exports.create = (request, response) => {
@@ -57,12 +60,6 @@ exports.create = (request, response) => {
     });
   }
 
-  // if (Person.find({ name: body.name }) !== null) {
-  //   return response.status(400).json({
-  //     error: "name already exsist",
-  //   });
-  // }
-
   const person = new Person({
     name: body.name,
     number: body.number,
@@ -78,8 +75,17 @@ exports.create = (request, response) => {
     });
 };
 
-const isDuplicate = (name) => {
-  return persons.some(
-    (person) => person.name.toLowerCase() === name.toLowerCase()
-  );
+exports.update = (request, response, next) => {
+  const body = request.body;
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then((updatedNote) => {
+      return response.json(updatedNote);
+    })
+    .catch((error) => next(error));
 };

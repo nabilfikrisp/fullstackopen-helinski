@@ -4,7 +4,7 @@ const personController = require("../controllers/personController");
 
 router.get("/", personController.index);
 router.get("/:id", personController.show);
-// router.get("/info", personController.info);
+router.put("/:id", personController.update);
 router.delete("/:id", personController.delete);
 router.post("/", personController.create);
 
