@@ -1,7 +1,4 @@
-const { response } = require("express");
-const Person = require("../models/person");
-
-let persons = require("../models/person");
+const Person = require('../models/person');
 
 exports.index = (request, response) => {
   Person.find({}).then((people) => {
@@ -33,32 +30,14 @@ exports.info = (request, response) => {
 
 exports.delete = (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then((result) => {
+    .then(() => {
       return response.status(204).end();
     })
     .catch((error) => next(error));
 };
 
-exports.create = (request, response) => {
+exports.create = (request, response, next) => {
   const body = request.body;
-
-  if (!body) {
-    return response.status(400).json({
-      error: "content missing",
-    });
-  }
-
-  if (!body.name) {
-    return response.status(400).json({
-      error: "name field missing",
-    });
-  }
-
-  if (!body.number) {
-    return response.status(400).json({
-      error: "number field missing",
-    });
-  }
 
   const person = new Person({
     name: body.name,
@@ -70,20 +49,21 @@ exports.create = (request, response) => {
     .then((result) => {
       return response.status(201).json(result);
     })
-    .catch((error) => {
-      return response.statis(400).json(`error saving data: ${error}`);
-    });
+    .catch((error) => next(error));
 };
 
 exports.update = (request, response, next) => {
-  const body = request.body;
+  const { name, number } = request.body;
 
-  const person = {
-    name: body.name,
-    number: body.number,
-  };
-
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(
+    request.params.id,
+    { name, number },
+    {
+      new: true,
+      runValidators: true,
+      context: 'query',
+    }
+  )
     .then((updatedNote) => {
       return response.json(updatedNote);
     })
