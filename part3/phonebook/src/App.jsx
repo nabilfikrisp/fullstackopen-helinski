@@ -54,26 +54,33 @@ const App = () => {
           (person) => person.name === newPerson.name
         );
         const personToUpdate = persons[personToUpdateIdx];
-        personApi.update(personToUpdate.id, newPerson).then((response) => {
-          setPersons((prev) =>
-            prev.map((person) =>
-              person.id === response.id
-                ? { ...person, number: response.number }
-                : person
-            )
-          );
+        personApi
+          .update(personToUpdate.id, newPerson)
+          .then((response) => {
+            setPersons((prev) =>
+              prev.map((person) =>
+                person.id === response.id
+                  ? { ...person, number: response.number }
+                  : person
+              )
+            );
 
-          setFilteredPerson((prev) =>
-            prev.map((person) =>
-              person.id === response.id
-                ? { ...person, number: response.number }
-                : person
-            )
-          );
-          setNewPerson({ name: "", number: "" });
-          setIsError(false);
-          setErrorMessage(`successfully updated ${response.name}`);
-        });
+            setFilteredPerson((prev) =>
+              prev.map((person) =>
+                person.id === response.id
+                  ? { ...person, number: response.number }
+                  : person
+              )
+            );
+            setNewPerson({ name: "", number: "" });
+            setIsError(false);
+            setErrorMessage(`successfully updated ${response.name}`);
+          })
+          .catch((error) => {
+            setIsError(true);
+            setErrorMessage(`${error.response.data.error}`);
+            console.log(error.response.data.error);
+          });
       }
       return;
     }
@@ -91,7 +98,8 @@ const App = () => {
       })
       .catch((error) => {
         setIsError(true);
-        setErrorMessage(`${error}`);
+        setErrorMessage(`${error.response.data.error}`);
+        console.log(error.response.data.error);
       });
   };
 
