@@ -1,29 +1,36 @@
-let persons = [
-  {
-    name: "Arto Hellas",
-    number: "040-123456",
-    id: 1,
-  },
-  {
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-    id: 2,
-  },
-  {
-    name: "Dan Abramov",
-    number: "12-43-234345",
-    id: 3,
-  },
-  {
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-    id: 4,
-  },
-  {
-    name: "To be Deleted",
-    number: "39-23-6423123",
-    id: 5,
-  },
-];
+const mongoose = require("mongoose");
 
-module.exports = persons;
+mongoose.set("strictQuery", false);
+
+const url = process.env.MONGODB_URI;
+console.log("connecting to", url);
+mongoose
+  .connect(url)
+  .then((result) => {
+    console.log("connected to MongoDB");
+  })
+  .catch((error) => {
+    console.log("error connecting to MongoDB:", error.message);
+  });
+
+const personSchema = new mongoose.Schema({
+  id: Number,
+  name: {
+    type: String,
+    unique: true,
+  },
+  number: {
+    type: String,
+    unique: true,
+  },
+});
+
+personSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+module.exports = mongoose.model("Person", personSchema);

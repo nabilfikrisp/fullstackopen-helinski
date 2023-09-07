@@ -1,10 +1,13 @@
+require("dotenv").config();
 const express = require("express");
 const routes = require("./routes/index");
 const unknownEndpoint = require("./middlewares/unknownEndpoint");
 const morgan = require("./middlewares/customMorgan");
 const cors = require("cors");
+const mongoose = require("mongoose");
+
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(morgan);

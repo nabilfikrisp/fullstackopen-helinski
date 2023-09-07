@@ -1,32 +1,32 @@
 const { response } = require("express");
-const generateId = require("../utils/generateId");
+const Person = require("../models/person");
+
 let persons = require("../models/person");
 
 exports.index = (request, response) => {
-  response.json(persons);
+  Person.find({}).then((people) => {
+    return response.json(people);
+  });
 };
 
 exports.show = (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((person) => person.id === id);
-
-  if (!person) {
-    return response
-      .status(404)
-      .json({
-        error: "person not found",
-      })
-      .end();
-  }
-  return response.json(person);
+  Person.findById(request.params.id)
+    .then((person) => {
+      return response.json(person);
+    })
+    .catch((error) => {
+      return console.log("error on person controller:", error);
+    });
 };
 
 exports.info = (request, response) => {
-  const totalPerson = persons.length;
   const date = new Date();
-  return response.send(
-    `<h2>Phonebook has info for ${totalPerson} people</h2><br/><p>${date}</p>`
-  );
+
+  Person.count().then((count) => {
+    return response.send(
+      `<h2>Phonebook has info for ${count} people</h2><br/><p>${date}</p>`
+    );
+  });
 };
 
 exports.delete = (request, response) => {
@@ -57,21 +57,25 @@ exports.create = (request, response) => {
     });
   }
 
-  if (isDuplicate(body.name)) {
+  if (Person.find({ name: body.name }) !== null) {
     return response.status(400).json({
       error: "name already exsist",
     });
   }
 
-  const newPerson = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(persons),
-  };
+  });
 
-  persons = [...persons, newPerson];
-
-  return response.status(201).json(newPerson);
+  person
+    .save()
+    .then((result) => {
+      return response.status(201).json(result);
+    })
+    .catch((error) => {
+      return response.statis(400).json(`error saving data: ${error}`);
+    });
 };
 
 const isDuplicate = (name) => {
