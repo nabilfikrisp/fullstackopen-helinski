@@ -1,12 +1,12 @@
 const Person = require('../models/person');
 
-exports.index = (request, response) => {
+const index = (request, response) => {
   Person.find({}).then((people) => {
     return response.json(people);
   });
 };
 
-exports.show = (request, response, next) => {
+const show = (request, response, next) => {
   Person.findById(request.params.id)
     .then((person) => {
       if (person) {
@@ -18,7 +18,7 @@ exports.show = (request, response, next) => {
     .catch((error) => next(error));
 };
 
-exports.info = (request, response) => {
+const info = (request, response) => {
   const date = new Date();
 
   Person.count().then((count) => {
@@ -28,7 +28,7 @@ exports.info = (request, response) => {
   });
 };
 
-exports.delete = (request, response, next) => {
+const deleteById = (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(() => {
       return response.status(204).end();
@@ -36,7 +36,7 @@ exports.delete = (request, response, next) => {
     .catch((error) => next(error));
 };
 
-exports.create = (request, response, next) => {
+const create = (request, response, next) => {
   const body = request.body;
 
   const person = new Person({
@@ -52,7 +52,7 @@ exports.create = (request, response, next) => {
     .catch((error) => next(error));
 };
 
-exports.update = (request, response, next) => {
+const update = (request, response, next) => {
   const { name, number } = request.body;
 
   Person.findByIdAndUpdate(
@@ -68,4 +68,8 @@ exports.update = (request, response, next) => {
       return response.json(updatedNote);
     })
     .catch((error) => next(error));
+};
+
+module.exports = {
+  create, deleteById, index, info, update, show
 };
