@@ -104,7 +104,7 @@ describe("API DELETE", () => {
   });
 
   test("delete non existent id", async () => {
-    await api.delete(`/api/blogs/64fb605a7d9a634499f2e111`).expect(400);
+    await api.delete(`/api/blogs/64fb605a7d9a634499f2e112`).expect(400);
   });
 });
 
