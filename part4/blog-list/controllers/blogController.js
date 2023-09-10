@@ -1,7 +1,17 @@
 const Blog = require("../models/blog");
+const User = require("../models/user");
+const jwt = require("jsonwebtoken");
+
+// const getTokenFrom = (request) => {
+//   const authorization = request.get("authorization");
+//   if (authorization && authorization.startsWith("Bearer ")) {
+//     return authorization.replace("Bearer ", "");
+//   }
+//   return null;
+// };
 
 const getAll = async (request, response) => {
-  const blogs = await Blog.find({});
+  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
   response.json(blogs);
 };
 
@@ -14,29 +24,51 @@ const show = async (request, response) => {
 };
 
 const save = async (request, response) => {
-  const blog = new Blog(request.body);
+  const { title, author, url, likes } = request.body;
 
-  if (!blog.likes) {
-    blog.likes = 0;
-  }
+  const user = request.user;
 
-  if (!blog.title || !blog.url) {
+  if (!title || !url) {
     return response
       .status(400)
       .json("request should contain title or url body");
   }
 
-  const result = await blog.save();
+  const blog = new Blog({
+    title,
+    author,
+    url,
+    likes: likes ? likes : 0,
+    user: user.id,
+  });
 
-  return response.status(201).json(result);
+  const savedBlog = await blog.save();
+  user.blogs = [...user.blogs, savedBlog];
+  await user.save();
+
+  return response.status(201).json(savedBlog);
 };
 
 const deleteById = async (request, response) => {
-  const result = await Blog.findByIdAndDelete(request.params.id);
-  if (!result) {
-    return response.status(400).end();
+  const blogId = request.params.id;
+  const user = request.user;
+  const blog = await Blog.findById(blogId);
+  if (!blog) {
+    return response.status(400).json({ error: "invalid blog id" });
   }
-  return response.status(204).json(result);
+
+  if (blog.user.toString() !== user.id.toString()) {
+    return response.status(401).josn({ error: "unauthorized delete action" });
+  }
+
+  user.blogs = user.blogs.filter(
+    (item) => item.toString() !== blog.id.toString()
+  );
+  await user.save();
+
+  await Blog.deleteOne(blog);
+
+  return response.status(204).json("test delete");
 };
 
 const update = async (request, response) => {
