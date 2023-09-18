@@ -72,7 +72,7 @@ const update = async (request, response) => {
       runValidators: true,
       context: "query",
     }
-  );
+  ).populate("user", { username: 1, name: 1 });
 
   if (!updateBlog) {
     return response.status(400).end();

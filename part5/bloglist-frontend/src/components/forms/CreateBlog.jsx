@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Alert from "../Alert";
 import blogService from "../../services/blogs";
 
-const CreateBlog = ({ reFetchBlogs }) => {
+const CreateBlog = ({ reFetchBlogs, setShowCreateBlog }) => {
   const [newBlog, setNewBlog] = useState({
     title: "",
     author: "",
@@ -39,6 +39,11 @@ const CreateBlog = ({ reFetchBlogs }) => {
       setMyAlert({
         message: `a new blog ${newBlog.title} by ${newBlog.author} added`,
         type: "success",
+      });
+      setNewBlog({
+        title: "",
+        author: "",
+        url: "",
       });
       reFetchBlogs();
     } catch (error) {
@@ -94,6 +99,7 @@ const CreateBlog = ({ reFetchBlogs }) => {
         />
         <button type="submit">Create</button>
       </form>
+      <button onClick={() => setShowCreateBlog(false)}>cancel</button>
     </div>
   );
 };
