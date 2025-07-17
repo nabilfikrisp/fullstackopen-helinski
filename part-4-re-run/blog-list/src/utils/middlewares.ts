@@ -7,7 +7,6 @@ export function errorHandler(
   response: express.Response,
   _next: express.NextFunction
 ) {
-  console.log(error, "ASSADASD");
   if (error instanceof mongoose.Error.ValidationError) {
     return response.status(400).json({ error: error.message });
   }

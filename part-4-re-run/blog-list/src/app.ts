@@ -1,4 +1,5 @@
 import { blogRouter } from "#controllers/blog.js";
+import config from "#utils/config.js";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
@@ -12,7 +13,10 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(morgan(":method :url :status :response-time ms :body"));
+
+if (config.ENABLE_LOGGING) {
+  app.use(morgan(":method :url :status :response-time ms :body"));
+}
 
 app.use("/api/blogs", blogRouter);
 

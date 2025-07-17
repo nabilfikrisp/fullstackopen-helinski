@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
+  ENABLE_LOGGING: z.stringbool().default(true),
   MONGODB_URI: z.string(),
   PORT: z
     .string()
@@ -15,6 +16,7 @@ type EnvSchema = z.infer<typeof envSchema>;
 const env = envSchema.parse(process.env);
 
 const config: EnvSchema = {
+  ENABLE_LOGGING: env.ENABLE_LOGGING,
   MONGODB_URI: env.MONGODB_URI,
   PORT: env.PORT,
 };

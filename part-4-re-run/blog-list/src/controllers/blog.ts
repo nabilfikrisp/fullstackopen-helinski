@@ -16,6 +16,9 @@ blogRouter.post("/", async (request: Request, response: Response, next: NextFunc
 blogRouter.get("/", async (_request: Request, response: Response, next: NextFunction) => {
   try {
     const blogs = await Blog.find({});
+    if (blogs.length === 0) {
+      return response.status(404).json({ error: "Blogs not found" });
+    }
     return response.json(blogs);
   } catch (error) {
     next(error);
