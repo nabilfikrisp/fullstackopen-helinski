@@ -1,12 +1,6 @@
 import mongoose, { InferSchemaType } from "mongoose";
 
 const blogSchema = new mongoose.Schema({
-  author: {
-    minLength: 3,
-    required: true,
-    trim: true,
-    type: String,
-  },
   likes: {
     default: 0,
     type: Number,
@@ -18,6 +12,12 @@ const blogSchema = new mongoose.Schema({
     type: String,
   },
   url: {
+    trim: true,
+    type: String,
+  },
+  author: {
+    minLength: 3,
+    required: true,
     trim: true,
     type: String,
   },
@@ -33,3 +33,7 @@ blogSchema.set("toJSON", {
 
 export type IBlog = InferSchemaType<typeof blogSchema>;
 export const Blog = mongoose.model<IBlog>("Blog", blogSchema);
+export type IBlogWithId = IBlog & {
+  id: string;
+};
+export type IBlogForCreation = Omit<IBlog, "id" | "user">;
