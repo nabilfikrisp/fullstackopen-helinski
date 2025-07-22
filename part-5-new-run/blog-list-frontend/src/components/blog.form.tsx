@@ -73,7 +73,7 @@ export default function BlogForm({ setBlogs }: BlogFormProps) {
         />
       </div>
       <button type="submit" disabled={loading}>
-        {loading ? "Creating..." : "Create Blog"}
+        {loading ? "Submitting..." : "Submit"}
       </button>
     </form>
   );

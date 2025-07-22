@@ -6,6 +6,7 @@ import { useToast } from "../toast/use-toast";
 type LoginFormProps = {
   setUser: React.Dispatch<React.SetStateAction<ILoginResponse | null>>;
 };
+
 export default function LoginForm({ setUser }: LoginFormProps) {
   const { toast } = useToast();
   const [username, setUsername] = useState("");
@@ -20,31 +21,40 @@ export default function LoginForm({ setUser }: LoginFormProps) {
       setUser(data);
       window.localStorage.setItem("loggedUser", JSON.stringify(data));
       toast(`Welcome ${data.name}!`);
-      setLoading(false);
     } catch (error) {
       console.error("Login failed:", error);
       toast("Login failed. Please check your credentials.");
+    } finally {
       setLoading(false);
     }
   }
+
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleLogin} autoComplete="on">
       <div>
-        <label htmlFor="username">Username</label>
+        <label htmlFor="login-username">Username</label>
         <input
+          id="login-username"
           type="text"
           value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
+          name="username"
+          autoComplete="username"
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          disabled={loading}
         />
       </div>
       <div>
-        <label htmlFor="password">Password</label>
+        <label htmlFor="login-password">Password</label>
         <input
+          id="login-password"
           type="password"
           value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
+          name="password"
+          autoComplete="current-password"
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={loading}
         />
       </div>
       <button type="submit" disabled={loading}>
