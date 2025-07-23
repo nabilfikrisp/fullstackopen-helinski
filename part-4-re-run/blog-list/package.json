@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx --watch --env-file .env.development src/index.ts",
-    "start": "node --env-file .env dist/index.js",
-    "test": "tsx --test --env-file .env.test",
+    "dev": "node --conditions=development --import=tsx --watch --env-file .env.development src/index.ts",
+    "test": "node --conditions=development --import=tsx --test --env-file .env.test",
+    "start": "node --env-file .env dist/src/index.js",
+    "start:test": "node --env-file .env.test dist/src/index.js",
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
@@ -19,7 +20,10 @@
   "license": "ISC",
   "type": "module",
   "imports": {
-    "#*": "./src/*"
+    "#*": {
+      "development": "./src/*",
+      "default": "./dist/src/*"
+    }
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

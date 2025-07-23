@@ -46,6 +46,7 @@ export default function BlogForm({ setBlogs }: BlogFormProps) {
       <div>
         <label htmlFor="title">Title</label>
         <input
+          id="title"
           type="text"
           name="title"
           value={formData.title}
@@ -56,6 +57,7 @@ export default function BlogForm({ setBlogs }: BlogFormProps) {
       <div>
         <label htmlFor="author">Author</label>
         <input
+          id="author"
           type="text"
           name="author"
           value={formData.author}
@@ -66,6 +68,7 @@ export default function BlogForm({ setBlogs }: BlogFormProps) {
       <div>
         <label htmlFor="url">URL</label>
         <input
+          id="url"
           type="text"
           name="url"
           value={formData.url}

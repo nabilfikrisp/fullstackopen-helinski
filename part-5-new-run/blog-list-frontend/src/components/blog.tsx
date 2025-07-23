@@ -44,8 +44,14 @@ export default function Blog({
   }
 
   return (
-    <article aria-label={`Blog post: ${localBlog.title}`} style={articleStyle}>
-      <strong>{localBlog.title}</strong>
+    <article
+      aria-label={`Blog post: ${localBlog.title}`}
+      style={articleStyle}
+      className="blog"
+    >
+      <strong>
+        {localBlog.title} - {blog.author}
+      </strong>
       <button onClick={() => setIsDetail((v) => !v)}>
         {isDetail ? "Hide" : "Show"} Details
       </button>
@@ -87,15 +93,25 @@ function BlogDetails({
         URL: <a href={blog.url}>{blog.url || "-"}</a>
       </p>
       <div>
-        Like: {blog.likes || 0}{" "}
-        <button onClick={onLike} disabled={loading}>
-          Like
-        </button>
+        Like: {blog.likes || 0} <LikeButton onLike={onLike} loading={loading} />
       </div>
-      <p>Author: {blog.author}</p>
       <button onClick={handleDelete} disabled={loading}>
         delete
       </button>
     </div>
+  );
+}
+
+export function LikeButton({
+  onLike,
+  loading,
+}: {
+  onLike: () => void;
+  loading: boolean;
+}) {
+  return (
+    <button onClick={onLike} disabled={loading}>
+      Like
+    </button>
   );
 }
