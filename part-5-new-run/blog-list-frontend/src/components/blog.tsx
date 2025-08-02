@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { deleteBlog, likeBlog } from "../services/blog";
 import type { IBlog } from "../types/blog.type";
+import { IntializeUser } from "../services/login";
 
 export default function Blog({
   blog,
@@ -87,6 +88,8 @@ function BlogDetails({
   loading: boolean;
   handleDelete: () => void;
 }) {
+  const user = IntializeUser();
+
   return (
     <div>
       <p>
@@ -95,9 +98,11 @@ function BlogDetails({
       <div>
         Like: {blog.likes || 0} <LikeButton onLike={onLike} loading={loading} />
       </div>
-      <button onClick={handleDelete} disabled={loading}>
-        delete
-      </button>
+      {user!.id === blog.createdBy && (
+        <button onClick={handleDelete} disabled={loading}>
+          delete
+        </button>
+      )}
     </div>
   );
 }

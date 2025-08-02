@@ -7,7 +7,7 @@
     "dev": "node --conditions=development --import=tsx --watch --env-file .env.development src/index.ts",
     "test": "node --conditions=development --import=tsx --test --env-file .env.test",
     "start": "node --env-file .env dist/src/index.js",
-    "start:test": "node --env-file .env.test dist/src/index.js",
+    "dev:test:e2e": "node --conditions=development --import=tsx --watch --env-file .env.test src/index.ts",
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",

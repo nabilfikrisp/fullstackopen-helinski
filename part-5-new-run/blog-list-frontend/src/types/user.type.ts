@@ -7,7 +7,7 @@ export type IUser = {
   blogs: IBlog[];
 };
 
-export type IUserState = Omit<IUser, "blogs" | "id">;
+export type IUserState = Omit<IUser, "blogs">;
 export type ILoginResponse = IUserState & {
   token: string;
 };

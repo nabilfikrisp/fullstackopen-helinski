@@ -21,6 +21,11 @@ const blogSchema = new mongoose.Schema({
     trim: true,
     type: String,
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 blogSchema.set("toJSON", {

@@ -8,6 +8,7 @@ import { setupMorganToken } from "./utils/logger.js";
 import { errorHandler, unknownEndpoint } from "./utils/middlewares.js";
 import { usersRouter } from "#controllers/user.js";
 import loginRouter from "#controllers/login.js";
+import { testingRouter } from "#controllers/testing.js";
 
 setupMorganToken(morgan);
 
@@ -18,6 +19,10 @@ app.use(cors());
 
 if (config.ENABLE_LOGGING) {
   app.use(morgan(":method :url :status :response-time ms :body"));
+}
+
+if (config.NODE_ENV === "TEST") {
+  app.use("/api/testing", testingRouter);
 }
 
 app.use("/api/blogs", blogsRouter);

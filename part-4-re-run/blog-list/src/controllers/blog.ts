@@ -44,22 +44,23 @@ blogsRouter.post("/", async (request: Request, response: Response, next: NextFun
       return response.status(401).json({ error: "Unauthorized" });
     }
 
-    const author = await User.findById(authenticatedUser.id);
-    if (!author) {
+    const creator = await User.findById(authenticatedUser.id);
+    if (!creator) {
       return response.status(400).json({ error: "Author not found" });
     }
 
     const blog = new Blog({
       title: body.title,
       url: body.url ?? "",
-      author: author._id,
+      createdBy: creator._id,
+      author: body.author,
       ...(body.likes ? { likes: body.likes } : {}),
     });
 
     const savedBlog = await blog.save();
 
-    author.blogs = author.blogs.concat(savedBlog._id);
-    await author.save();
+    creator.blogs = creator.blogs.concat(savedBlog._id);
+    await creator.save();
 
     return response.status(201).json(savedBlog);
   } catch (error) {
@@ -102,7 +103,7 @@ blogsRouter.delete("/:id", async (request: Request, response: Response, next: Ne
       return response.status(404).json({ error: "Blog not found" });
     }
 
-    if (blog.author.toString() !== authenticatedUser.id.toString()) {
+    if (blog.createdBy.toString() !== authenticatedUser.id.toString()) {
       return response.status(403).json({ error: "Forbidden" });
     }
 

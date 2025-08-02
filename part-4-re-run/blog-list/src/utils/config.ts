@@ -12,6 +12,7 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1, {
     message: "JWT_SECRET must be defined",
   }),
+  NODE_ENV: z.enum(["PRODUCTION", "DEVELOPMENT", "TEST"]).default("DEVELOPMENT").optional(),
 });
 
 type EnvSchema = z.infer<typeof envSchema>;
@@ -23,6 +24,7 @@ const config: EnvSchema = {
   MONGODB_URI: env.MONGODB_URI,
   PORT: env.PORT,
   JWT_SECRET: env.JWT_SECRET,
+  NODE_ENV: env.NODE_ENV,
 };
 
 export default config;
