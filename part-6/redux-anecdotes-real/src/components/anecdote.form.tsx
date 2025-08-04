@@ -1,8 +1,10 @@
 import { useDispatch } from "react-redux";
-import { newAnecdoteAction } from "../reducers/anecdoteReducer";
+import { createAnecdote } from "../reducers/anecdoteReducer";
+import { setTimedNotification } from "../reducers/notificationReducer";
+import type { AppDispatch } from "../store";
 
 export default function AnecdoteForm() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   function addAnecdote(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -13,7 +15,8 @@ export default function AnecdoteForm() {
 
     const content = anecdoteContent.value;
 
-    dispatch(newAnecdoteAction(content));
+    dispatch(createAnecdote(content));
+    dispatch(setTimedNotification(`You created '${content}'`, 5));
 
     anecdoteContent.value = "";
   }

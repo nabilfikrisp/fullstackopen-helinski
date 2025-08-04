@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setFilterAction } from "../reducers/filterReducer";
+import { setFilter } from "../reducers/filterReducer";
 import type { RootState } from "../store";
 
 export default function Filter() {
@@ -7,7 +7,7 @@ export default function Filter() {
   const filter = useSelector((state: RootState) => state.filter);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setFilterAction(event.target.value));
+    dispatch(setFilter(event.target.value));
   };
 
   const style = {

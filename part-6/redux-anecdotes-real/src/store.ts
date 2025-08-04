@@ -1,13 +1,16 @@
-import { createStore, combineReducers } from "redux";
-import anecdoteReducer from "./reducers/anecdoteReducer";
-import filterReducer from "./reducers/filterReducer";
+import { configureStore } from "@reduxjs/toolkit";
+import { anecdoteReducer } from "./reducers/anecdoteReducer";
+import { filterReducer } from "./reducers/filterReducer";
+import { notificationReducer } from "./reducers/notificationReducer";
 
-const reducer = combineReducers({
-  anecdotes: anecdoteReducer,
-  filter: filterReducer,
+const store = configureStore({
+  reducer: {
+    anecdotes: anecdoteReducer,
+    filter: filterReducer,
+    notification: notificationReducer,
+  },
 });
 
-const store = createStore(reducer);
-
-export type RootState = ReturnType<typeof reducer>;
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 export default store;
