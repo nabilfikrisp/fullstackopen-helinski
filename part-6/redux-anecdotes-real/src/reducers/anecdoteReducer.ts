@@ -66,9 +66,10 @@ const reducer = (state = initialState, action: AnecdoteAction) => {
       };
       return [...state, newAnecdote];
     }
-  }
 
-  return state;
+    default:
+      return state;
+  }
 };
 
 export default reducer;
