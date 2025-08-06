@@ -1,8 +1,11 @@
 import type { FormEvent } from "react";
 import { usePostAnecdote } from "../services/anecdotes";
+import { useNotification } from "../contexts/notification.context";
+import { handleError } from "../utils/handle-error";
 
 export default function AnecdoteForm() {
   const { mutateAsync, isPending } = usePostAnecdote();
+  const { setNotification } = useNotification();
   async function onCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -15,12 +18,12 @@ export default function AnecdoteForm() {
       const content = anecdoteContent.value;
 
       await mutateAsync(content);
-
+      setNotification(`You created a new anecdote: "${content}"`, 5000);
       anecdoteContent.value = "";
       console.log(`new anecdote ${content}`);
     } catch (error: unknown) {
-      alert(error instanceof Error ? error.message : "An error occurred");
-      console.error("Error creating anecdote:", error);
+      const errorMessage = handleError(error);
+      setNotification(`Error creating anecdote: ${errorMessage}`, 5000);
     }
   }
 

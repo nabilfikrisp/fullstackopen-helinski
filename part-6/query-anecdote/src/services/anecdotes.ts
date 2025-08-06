@@ -1,6 +1,7 @@
 import axios from "axios";
 import { type Anecdote } from "../types/anecdote";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ValidationError } from "../utils/validation-error";
 
 const BASE_URL = "http://localhost:3001/anecdotes";
 
@@ -24,7 +25,7 @@ export function useGetAnecdotes() {
 
 async function createAnecdote(content: Anecdote["content"]) {
   if (content.split("").length < 5) {
-    throw new Error("Content must be at least 5 characters long");
+    throw new ValidationError("Content must be at least 5 characters long");
   }
 
   const newAnecdote: Anecdote = {

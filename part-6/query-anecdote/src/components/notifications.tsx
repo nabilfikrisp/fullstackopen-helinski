@@ -1,4 +1,8 @@
-export default function Notification() {
+import { useNotification } from "../contexts/notification.context";
+
+const Notification = () => {
+  const { notification } = useNotification();
+
   const style = {
     border: "solid",
     padding: 10,
@@ -6,5 +10,9 @@ export default function Notification() {
     marginBottom: 5,
   };
 
-  return <div style={style}>asd</div>;
-}
+  if (!notification.message) return null;
+
+  return <div style={style}>{notification.message}</div>;
+};
+
+export default Notification;
