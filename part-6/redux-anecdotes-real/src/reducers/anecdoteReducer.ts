@@ -1,6 +1,15 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  type Dispatch,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import type { Anecdote } from "../types/anecdote.type";
-import { getId } from "../services/anecdotes";
+import {
+  getAnecdotes,
+  getId,
+  postAnecdotes,
+  putAnecdote,
+} from "../services/anecdotes";
 
 // const asObject = (anecdote: string) => {
 //   return {
@@ -45,4 +54,26 @@ const anecdoteSlice = createSlice({
 
 export const { voteAnecdote, createAnecdote, appendAnecdotes } =
   anecdoteSlice.actions;
+
+export function initializeAnecdotes() {
+  return async (dispatch: Dispatch) => {
+    const anecdotes = await getAnecdotes();
+    dispatch(appendAnecdotes(anecdotes));
+  };
+}
+
+export function createAnecdoteAction(content: Anecdote["content"]) {
+  return async (dispatch: Dispatch) => {
+    await postAnecdotes(content);
+    dispatch(createAnecdote(content));
+  };
+}
+
+export function voteAnecdoteAction(anecdote: Anecdote) {
+  return async (dispatch: Dispatch) => {
+    await putAnecdote(anecdote);
+    dispatch(voteAnecdote(anecdote.id));
+  };
+}
+
 export const anecdoteReducer = anecdoteSlice.reducer;

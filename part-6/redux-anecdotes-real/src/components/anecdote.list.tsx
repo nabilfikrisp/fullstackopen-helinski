@@ -1,9 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { appendAnecdotes, voteAnecdote } from "../reducers/anecdoteReducer";
+import {
+  initializeAnecdotes,
+  voteAnecdoteAction,
+} from "../reducers/anecdoteReducer";
 import { setTimedNotification } from "../reducers/notificationReducer";
 import type { RootState, AppDispatch } from "../store";
 import { useEffect } from "react";
-import { getAnecdotes } from "../services/anecdotes";
+import type { Anecdote } from "../types/anecdote.type";
 
 export default function AnecdoteList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -14,9 +17,9 @@ export default function AnecdoteList() {
     anecdote.content.toLowerCase().includes(filter.toLowerCase())
   );
 
-  const vote = (id: string, content: string) => {
-    dispatch(voteAnecdote(id));
-    dispatch(setTimedNotification(`You voted '${content}'`, 5));
+  const vote = (anecdote: Anecdote) => {
+    dispatch(voteAnecdoteAction(anecdote));
+    dispatch(setTimedNotification(`You voted '${anecdote.content}'`, 5));
   };
 
   const sortedAnecdotes = [...filteredAnecdotes].sort(
@@ -24,11 +27,7 @@ export default function AnecdoteList() {
   );
 
   useEffect(() => {
-    async function initializeAnecdotes() {
-      const anecdotes = await getAnecdotes();
-      dispatch(appendAnecdotes(anecdotes));
-    }
-    initializeAnecdotes();
+    dispatch(initializeAnecdotes());
   }, [dispatch]);
 
   return (
@@ -39,9 +38,7 @@ export default function AnecdoteList() {
           <div>{anecdote.content}</div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => vote(anecdote.id, anecdote.content)}>
-              vote
-            </button>
+            <button onClick={() => vote(anecdote)}>vote</button>
           </div>
         </div>
       ))}
