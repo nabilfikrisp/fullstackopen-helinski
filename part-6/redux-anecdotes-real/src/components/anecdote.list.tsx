@@ -1,7 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
-import { voteAnecdote } from "../reducers/anecdoteReducer";
+import { appendAnecdotes, voteAnecdote } from "../reducers/anecdoteReducer";
 import { setTimedNotification } from "../reducers/notificationReducer";
 import type { RootState, AppDispatch } from "../store";
+import { useEffect } from "react";
+import { getAnecdotes } from "../services/anecdotes";
 
 export default function AnecdoteList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,6 +22,14 @@ export default function AnecdoteList() {
   const sortedAnecdotes = [...filteredAnecdotes].sort(
     (a, b) => b.votes - a.votes
   );
+
+  useEffect(() => {
+    async function initializeAnecdotes() {
+      const anecdotes = await getAnecdotes();
+      dispatch(appendAnecdotes(anecdotes));
+    }
+    initializeAnecdotes();
+  }, [dispatch]);
 
   return (
     <>
