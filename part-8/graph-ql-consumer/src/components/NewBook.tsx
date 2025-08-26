@@ -1,7 +1,13 @@
 import { useState, FormEvent, ChangeEvent } from "react";
 import { ComponentProps } from "../types";
+import { useMutation } from "@apollo/client/react";
+import { ADD_BOOK } from "../queries/mutations";
+import { ALL_AUTHORS, ALL_BOOKS } from "../queries/queries";
 
 const NewBook = ({ show }: ComponentProps): JSX.Element | null => {
+  const [mutate, { loading, error }] = useMutation(ADD_BOOK, {
+    refetchQueries: [ALL_BOOKS, ALL_AUTHORS],
+  });
   const [title, setTitle] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
   const [published, setPublished] = useState<string>("");
@@ -12,10 +18,22 @@ const NewBook = ({ show }: ComponentProps): JSX.Element | null => {
     return null;
   }
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
   const submit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
 
     console.log("add book...");
+
+    await mutate({
+      variables: { title, author, published: Number(published), genres },
+    });
 
     setTitle("");
     setPublished("");

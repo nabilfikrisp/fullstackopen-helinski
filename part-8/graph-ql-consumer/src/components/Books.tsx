@@ -1,11 +1,21 @@
+import { ALL_BOOKS } from "../queries/queries";
 import { ComponentProps, Book } from "../types";
+import { useQuery } from "@apollo/client/react";
 
 const Books = ({ show }: ComponentProps): JSX.Element | null => {
   if (!show) {
     return null;
   }
 
-  const books: Book[] = [];
+  const { loading, error, data } = useQuery<{ allBooks: Book[] }>(ALL_BOOKS);
+
+  if (loading || !data) {
+    return <div>loading...</div>;
+  }
+
+  if (error) {
+    return <div>error: {error.message}</div>;
+  }
 
   return (
     <div>
@@ -18,7 +28,7 @@ const Books = ({ show }: ComponentProps): JSX.Element | null => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a: Book) => (
+          {data.allBooks.map((a: Book) => (
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author}</td>

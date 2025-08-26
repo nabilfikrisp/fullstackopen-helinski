@@ -1,11 +1,24 @@
 import { ComponentProps, Author } from "../types";
+import { useQuery } from "@apollo/client/react";
+import { ALL_AUTHORS } from "../queries/queries";
+import { SetBirthYear } from "./SetBirthYear";
 
 const Authors = ({ show }: ComponentProps): JSX.Element | null => {
   if (!show) {
     return null;
   }
 
-  const authors: Author[] = [];
+  const { loading, error, data } = useQuery<{ allAuthors: Author[] }>(
+    ALL_AUTHORS
+  );
+
+  if (loading || !data) {
+    return <div>loading...</div>;
+  }
+
+  if (error) {
+    return <div>error: {error.message}</div>;
+  }
 
   return (
     <div>
@@ -17,7 +30,7 @@ const Authors = ({ show }: ComponentProps): JSX.Element | null => {
             <th>born</th>
             <th>books</th>
           </tr>
-          {authors.map((a: Author) => (
+          {data.allAuthors.map((a: Author) => (
             <tr key={a.name}>
               <td>{a.name}</td>
               <td>{a.born}</td>
@@ -26,6 +39,7 @@ const Authors = ({ show }: ComponentProps): JSX.Element | null => {
           ))}
         </tbody>
       </table>
+      <SetBirthYear authors={data.allAuthors} />
     </div>
   );
 };
