@@ -112,6 +112,10 @@ const resolvers: Resolvers = {
     },
     allAuthors: () => authors,
   },
+  Author: {
+    bookCount: (root) =>
+      books.filter((book) => book.author === root.name).length,
+  },
   Mutation: {
     addBook: (root, args) => {
       const newBook = { ...args, id: uuid() };

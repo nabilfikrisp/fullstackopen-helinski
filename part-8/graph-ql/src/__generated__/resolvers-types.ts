@@ -19,6 +19,7 @@ export type Scalars = {
 
 export type Author = {
   __typename?: 'Author';
+  bookCount?: Maybe<Scalars['Int']['output']>;
   born?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -162,6 +163,7 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type AuthorResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Author'] = ResolversParentTypes['Author']> = ResolversObject<{
+  bookCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   born?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
