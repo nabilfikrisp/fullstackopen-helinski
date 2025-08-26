@@ -6,6 +6,11 @@ import { v1 as uuid } from "uuid";
 
 import gql from "graphql-tag";
 
+export interface MyContext {
+  // Add any context properties you need here
+  // For now, it can be empty
+}
+
 const authors = [
   {
     name: "Robert Martin",
