@@ -1,0 +1,4 @@
+type Query {
+  booksCount: Int!
+  authorCount: Int!
+}
