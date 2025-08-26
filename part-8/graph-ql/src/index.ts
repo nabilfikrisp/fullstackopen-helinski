@@ -1,8 +1,10 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { readFileSync } from "fs";
-import gql from "graphql-tag";
 import { Resolvers } from "./__generated__/resolvers-types";
+import { v1 as uuid } from "uuid";
+
+import gql from "graphql-tag";
 
 const authors = [
   {
@@ -92,6 +94,49 @@ const resolvers: Resolvers = {
   Query: {
     booksCount: () => books.length,
     authorCount: () => authors.length,
+    allBooks: (root, args) => {
+      const { author, genre } = args;
+      let filteredBooks = books;
+
+      if (author) {
+        filteredBooks = filteredBooks.filter((book) => book.author === author);
+      }
+
+      if (genre) {
+        filteredBooks = filteredBooks.filter((book) =>
+          book.genres.includes(genre)
+        );
+      }
+
+      return filteredBooks;
+    },
+    allAuthors: () => authors,
+  },
+  Mutation: {
+    addBook: (root, args) => {
+      const newBook = { ...args, id: uuid() };
+      const { author } = args;
+
+      const existingAuthor = authors.find((a) => a.name === author);
+      if (!existingAuthor) {
+        const newAuthor = { name: author, id: uuid() };
+        authors.push(newAuthor);
+      }
+
+      books.push(newBook);
+      return newBook;
+    },
+    editAuthor: (root, args) => {
+      const { name, setBornTo } = args;
+      const existingAuthor = authors.find((a) => a.name === name);
+
+      if (!existingAuthor) {
+        return null;
+      }
+      const updatedAuthor = { ...existingAuthor, born: setBornTo };
+      authors[authors.indexOf(existingAuthor)] = updatedAuthor;
+      return updatedAuthor;
+    },
   },
 };
 
