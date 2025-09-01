@@ -1,6 +1,7 @@
 import { BuilderType, AuthorRefType } from "../../types";
 import { books } from "./data";
 import { Book } from "./types";
+import { authors } from "../author/data";
 
 export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
   const BookRef = builder.objectRef<Book>("Book");
@@ -35,7 +36,36 @@ export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
         return filteredBooks;
       },
     }),
+    booksCount: t.field({
+      type: "Int",
+      resolve: () => books.length,
+    }),
   }));
 
-  return { bookQueries, BookRef };
+  const bookMutations = builder.mutationFields((t) => ({
+    addBook: t.field({
+      type: BookRef,
+      args: {
+        title: t.arg.string({ required: true }),
+        published: t.arg.int({ required: true }),
+        author: t.arg.string({ required: true }),
+        genres: t.arg.stringList({ required: true }),
+      },
+      resolve: (_, args) => {
+        const { author: authorName } = args;
+        const existingAuthor = authors.find((a) => a.name === authorName);
+        const author =
+          existingAuthor ||
+          ({ name: authorName, id: Date.now().toString() } as any);
+        if (!existingAuthor) {
+          authors.push(author);
+        }
+        const newBook = { ...args, id: Date.now().toString(), author };
+        books.push(newBook);
+        return newBook;
+      },
+    }),
+  }));
+
+  return { bookQueries, BookRef, bookMutations };
 }

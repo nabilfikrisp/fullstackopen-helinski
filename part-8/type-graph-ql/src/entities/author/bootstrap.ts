@@ -55,6 +55,24 @@ export function bootstrapAuthor(builder: BuilderType) {
         return newAuthor;
       },
     }),
+    editAuthor: t.field({
+      type: AuthorRef,
+      args: {
+        name: t.arg.string({ required: true }),
+        setBornTo: t.arg.int({ required: true }),
+      },
+      resolve: (_, args) => {
+        const { name, setBornTo } = args;
+        const existingAuthor = authors.find((a) => a.name === name);
+
+        if (!existingAuthor) {
+          return null;
+        }
+        const updatedAuthor = { ...existingAuthor, born: setBornTo };
+        authors[authors.indexOf(existingAuthor)] = updatedAuthor;
+        return updatedAuthor;
+      },
+    }),
   }));
 
   return { authorQueries, authorMutations, AuthorRef };
