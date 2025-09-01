@@ -44,4 +44,3 @@ export async function startServer() {
 }
 
 startServer();
-startServer();
