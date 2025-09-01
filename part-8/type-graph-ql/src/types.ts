@@ -1,13 +1,18 @@
-export type BuilderType = PothosSchemaTypes.SchemaBuilder<
-  PothosSchemaTypes.ExtendDefaultTypes<{}>
+import SchemaBuilder from "@pothos/core";
+import { Author } from "./entities/author/types";
+
+export type ContextType = {};
+
+export type BuilderType = InstanceType<
+  typeof SchemaBuilder<{
+    Context: ContextType;
+  }>
 >;
 
-export type TQueryType = PothosSchemaTypes.QueryFieldBuilder<
-  PothosSchemaTypes.ExtendDefaultTypes<{}>,
-  {}
->;
-
-export type TMutationType = PothosSchemaTypes.MutationFieldBuilder<
-  PothosSchemaTypes.ExtendDefaultTypes<{}>,
-  {}
+export type AuthorRefType = PothosSchemaTypes.ImplementableObjectRef<
+  PothosSchemaTypes.ExtendDefaultTypes<{
+    Context: ContextType;
+  }>,
+  Author,
+  Author
 >;

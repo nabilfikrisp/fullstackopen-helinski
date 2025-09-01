@@ -1,11 +1,12 @@
-import { BuilderType } from "../../types";
+import { BuilderType, AuthorRefType } from "../../types";
 import { books } from "./data";
-import { Books } from "./types";
+import { Book } from "./types";
 
-export function bootstrapBook(builder: BuilderType, AuthorRef: any) {
-  const BookRef = builder.objectRef<Books>("Book");
+export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
+  const BookRef = builder.objectRef<Book>("Book");
   BookRef.implement({
     fields: (t) => ({
+      id: t.exposeID("id"),
       title: t.exposeString("title"),
       published: t.exposeInt("published"),
       author: t.expose("author", { type: AuthorRef }),

@@ -1,6 +1,7 @@
 import { Author } from "../author/types";
 
-export interface Books {
+export interface Book {
+  id: string;
   title: string;
   published: number;
   author: Author;

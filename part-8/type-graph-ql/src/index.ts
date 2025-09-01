@@ -4,10 +4,11 @@ import SchemaBuilder from "@pothos/core";
 
 import { bootstrapAuthor } from "./entities/author/bootstrap";
 import { bootstrapBook } from "./entities/books/bootstrap";
+import { ContextType } from "./types";
 
-export async function startServer() {
+function buildSchema() {
   const builder = new SchemaBuilder<{
-    Context: {};
+    Context: ContextType;
   }>({});
 
   builder.queryType({
@@ -29,7 +30,12 @@ export async function startServer() {
   const { AuthorRef } = bootstrapAuthor(builder);
   bootstrapBook(builder, AuthorRef);
 
-  const server = new ApolloServer({ schema: builder.toSchema() });
+  return builder.toSchema();
+}
+
+export async function startServer() {
+  const schema = buildSchema();
+  const server = new ApolloServer({ schema });
 
   const { url } = await startStandaloneServer(server, {
     listen: { port: 4000 },
@@ -37,4 +43,5 @@ export async function startServer() {
   console.log(`🚀  Server ready at: ${url}`);
 }
 
+startServer();
 startServer();
