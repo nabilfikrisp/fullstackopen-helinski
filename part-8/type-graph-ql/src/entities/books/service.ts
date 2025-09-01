@@ -1,12 +1,9 @@
 import { books } from "./data";
+import { Book } from "./types";
+import { authors } from "../author/data";
+import { Author } from "../author/types";
 
-type GetAllBooksParams = {
-  authorId?: string;
-  genre?: string;
-};
-function getAllBooks(args: GetAllBooksParams) {
-  const { authorId, genre } = args;
-
+function getAll(authorId?: string, genre?: string): Book[] {
   let filteredBooks = books;
   if (authorId) {
     filteredBooks = filteredBooks.filter((book) => book.author.id === authorId);
@@ -14,10 +11,41 @@ function getAllBooks(args: GetAllBooksParams) {
   if (genre) {
     filteredBooks = filteredBooks.filter((book) => book.genres.includes(genre));
   }
-
   return filteredBooks;
 }
 
-export const bookService = {
-  getAllBooks,
+function add(
+  title: string,
+  published: number,
+  authorName: string,
+  genres: string[]
+): Book {
+  let author = authors.find((a) => a.name === authorName);
+  if (!author) {
+    author = {
+      name: authorName,
+      id: Date.now().toString(),
+      born: undefined,
+    } as Author;
+    authors.push(author);
+  }
+  const newBook: Book = {
+    id: Date.now().toString(),
+    title,
+    published,
+    author,
+    genres,
+  };
+  books.push(newBook);
+  return newBook;
+}
+
+function count(): number {
+  return books.length;
+}
+
+export const BookService = {
+  getAll,
+  add,
+  count,
 };

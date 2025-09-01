@@ -1,7 +1,6 @@
 import { BuilderType, AuthorRefType } from "../../types";
-import { books } from "./data";
+import { BookService } from "./service";
 import { Book } from "./types";
-import { authors } from "../author/data";
 
 export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
   const BookRef = builder.objectRef<Book>("Book");
@@ -20,25 +19,13 @@ export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
       type: [BookRef],
       args: { authorId: t.arg.string(), genre: t.arg.string() },
       resolve: (_, args) => {
-        let filteredBooks = books;
         const { authorId, genre } = args;
-        if (authorId) {
-          filteredBooks = filteredBooks.filter(
-            (book) => book.author.id === authorId
-          );
-        }
-        if (genre) {
-          filteredBooks = filteredBooks.filter((book) =>
-            book.genres.includes(genre)
-          );
-        }
-
-        return filteredBooks;
+        return BookService.getAll(authorId ?? undefined, genre ?? undefined);
       },
     }),
     booksCount: t.field({
       type: "Int",
-      resolve: () => books.length,
+      resolve: () => BookService.count(),
     }),
   }));
 
@@ -52,17 +39,8 @@ export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
         genres: t.arg.stringList({ required: true }),
       },
       resolve: (_, args) => {
-        const { author: authorName } = args;
-        const existingAuthor = authors.find((a) => a.name === authorName);
-        const author =
-          existingAuthor ||
-          ({ name: authorName, id: Date.now().toString() } as any);
-        if (!existingAuthor) {
-          authors.push(author);
-        }
-        const newBook = { ...args, id: Date.now().toString(), author };
-        books.push(newBook);
-        return newBook;
+        const { title, published, author, genres } = args;
+        return BookService.add(title, published, author, genres);
       },
     }),
   }));

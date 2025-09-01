@@ -1,7 +1,7 @@
 import { BuilderType } from "../../types";
-import { books } from "../books/data";
-import { authors } from "./data";
+import { AuthorService } from "./service";
 import { Author } from "./types";
+import { books } from "../books/data";
 
 export function bootstrapAuthor(builder: BuilderType) {
   const AuthorRef = builder.objectRef<Author>("Author");
@@ -24,16 +24,16 @@ export function bootstrapAuthor(builder: BuilderType) {
   const authorQueries = builder.queryFields((t) => ({
     author: t.field({
       type: AuthorRef,
-      resolve: () => authors[0], // Return first author for simplicity
+      resolve: () => AuthorService.getFirst(),
     }),
 
     allAuthors: t.field({
       type: [AuthorRef],
-      resolve: () => authors,
+      resolve: () => AuthorService.getAll(),
     }),
 
     authorCount: t.int({
-      resolve: () => authors.length,
+      resolve: () => AuthorService.count(),
     }),
   }));
 
@@ -46,13 +46,7 @@ export function bootstrapAuthor(builder: BuilderType) {
       },
       resolve: (_, args) => {
         const { born, name } = args;
-        const newAuthor: Author = {
-          id: (authors.length + 1).toString(),
-          name,
-          born,
-        };
-        authors.push(newAuthor);
-        return newAuthor;
+        return AuthorService.create(name, born);
       },
     }),
     editAuthor: t.field({
@@ -63,14 +57,7 @@ export function bootstrapAuthor(builder: BuilderType) {
       },
       resolve: (_, args) => {
         const { name, setBornTo } = args;
-        const existingAuthor = authors.find((a) => a.name === name);
-
-        if (!existingAuthor) {
-          return null;
-        }
-        const updatedAuthor = { ...existingAuthor, born: setBornTo };
-        authors[authors.indexOf(existingAuthor)] = updatedAuthor;
-        return updatedAuthor;
+        return AuthorService.edit(name, setBornTo);
       },
     }),
   }));
