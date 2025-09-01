@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    // OUTPUT
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    // Compilation and Environment
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["esnext"],
+
+    //  TYPES
+    "types": ["node"],
+
+    // TYPE CHECKING
+    "esModuleInterop": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    // DX
+    "resolveJsonModule": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
