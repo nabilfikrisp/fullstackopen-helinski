@@ -1,50 +1,44 @@
-import { books } from "./data";
-import { Book } from "./types";
-import { authors } from "../author/data";
-import { Author } from "../author/types";
+import { Author, AuthorModel } from "../author/model";
+import { Book, BookModel } from "./model";
 
-function getAll(authorId?: string, genre?: string): Book[] {
-  let filteredBooks = books;
+async function getAuthor(authorId: string): Promise<Author | undefined> {
+  const author = await AuthorModel.findById(authorId).lean<Author>().exec();
+  return author ?? undefined;
+}
+
+async function getAll(
+  authorId?: string | null,
+  genre?: string | null
+): Promise<Book[]> {
+  let query: any = {};
   if (authorId) {
-    filteredBooks = filteredBooks.filter((book) => book.author.id === authorId);
+    query.author = authorId;
   }
   if (genre) {
-    filteredBooks = filteredBooks.filter((book) => book.genres.includes(genre));
+    query.genres = { $in: [genre] };
   }
-  return filteredBooks;
+  const books = await BookModel.find(query).lean<Book[]>().exec();
+  return books;
 }
 
-function add(
+async function count(): Promise<number> {
+  const count = await BookModel.countDocuments().exec();
+  return count;
+}
+
+async function add(
   title: string,
   published: number,
-  authorName: string,
+  author: string,
   genres: string[]
-): Book {
-  let author = authors.find((a) => a.name === authorName);
-  if (!author) {
-    author = {
-      name: authorName,
-      id: Date.now().toString(),
-      born: undefined,
-    } as Author;
-    authors.push(author);
-  }
-  const newBook: Book = {
-    id: Date.now().toString(),
-    title,
-    published,
-    author,
-    genres,
-  };
-  books.push(newBook);
-  return newBook;
-}
-
-function count(): number {
-  return books.length;
+): Promise<Book> {
+  const book = new BookModel({ title, published, author, genres });
+  const savedBook = await book.save();
+  return { ...savedBook.toObject(), id: savedBook._id.toString() };
 }
 
 export const BookService = {
+  getAuthor,
   getAll,
   add,
   count,

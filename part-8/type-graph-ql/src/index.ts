@@ -1,31 +1,22 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-import SchemaBuilder from "@pothos/core";
-
 import { bootstrapAuthor } from "./entities/author/bootstrap";
 import { bootstrapBook } from "./entities/books/bootstrap";
-import { ContextType } from "./types";
+import { ContextType } from "./utils/types";
+import { AuthorModel } from "./entities/author/model";
+import { BookModel } from "./entities/books/model";
+import { connectToDatabase } from "./utils/db";
+
+import SchemaBuilder from "@pothos/core";
+import ENV from "./utils/ENV";
 
 function buildSchema() {
   const builder = new SchemaBuilder<{
     Context: ContextType;
   }>({});
 
-  builder.queryType({
-    fields: (t) => ({
-      hello: t.string({
-        resolve: () => "hello, world!",
-      }),
-    }),
-  });
-
-  builder.mutationType({
-    fields: (t) => ({
-      helloMutation: t.string({
-        resolve: () => "hello, world!",
-      }),
-    }),
-  });
+  builder.queryType();
+  builder.mutationType();
 
   const { AuthorRef } = bootstrapAuthor(builder);
   bootstrapBook(builder, AuthorRef);
@@ -34,11 +25,18 @@ function buildSchema() {
 }
 
 export async function startServer() {
+  await connectToDatabase();
   const schema = buildSchema();
   const server = new ApolloServer({ schema });
 
   const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 },
+    listen: { port: ENV.PORT },
+    context: async () => ({
+      db: {
+        Author: AuthorModel,
+        Book: BookModel,
+      },
+    }),
   });
   console.log(`🚀  Server ready at: ${url}`);
 }

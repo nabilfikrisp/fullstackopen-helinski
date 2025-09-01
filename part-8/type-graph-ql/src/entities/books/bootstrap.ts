@@ -1,6 +1,6 @@
-import { BuilderType, AuthorRefType } from "../../types";
+import { BuilderType, AuthorRefType } from "../../utils/types";
 import { BookService } from "./service";
-import { Book } from "./types";
+import { Book } from "./model";
 
 export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
   const BookRef = builder.objectRef<Book>("Book");
@@ -9,8 +9,15 @@ export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
       id: t.exposeID("id"),
       title: t.exposeString("title"),
       published: t.exposeInt("published"),
-      author: t.expose("author", { type: AuthorRef }),
       genres: t.exposeStringList("genres"),
+
+      author: t.field({
+        type: AuthorRef,
+        resolve: async (book) => {
+          const author = await BookService.getAuthor(book.author.toString());
+          return author;
+        },
+      }),
     }),
   });
 
@@ -18,9 +25,10 @@ export function bootstrapBook(builder: BuilderType, AuthorRef: AuthorRefType) {
     allBooks: t.field({
       type: [BookRef],
       args: { authorId: t.arg.string(), genre: t.arg.string() },
-      resolve: (_, args) => {
+      resolve: async (_, args) => {
         const { authorId, genre } = args;
-        return BookService.getAll(authorId ?? undefined, genre ?? undefined);
+        const books = await BookService.getAll(authorId, genre);
+        return books;
       },
     }),
     booksCount: t.field({

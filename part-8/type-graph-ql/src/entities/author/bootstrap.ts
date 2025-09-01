@@ -1,7 +1,8 @@
-import { BuilderType } from "../../types";
+import { BuilderType } from "../../utils/types";
+import { GraphQLError } from "graphql";
+import { Author } from "./model";
 import { AuthorService } from "./service";
-import { Author } from "./types";
-import { books } from "../books/data";
+import { BookService } from "../books/service";
 
 export function bootstrapAuthor(builder: BuilderType) {
   const AuthorRef = builder.objectRef<Author>("Author");
@@ -14,8 +15,9 @@ export function bootstrapAuthor(builder: BuilderType) {
       //computed filed
       bookCount: t.field({
         type: "Int",
-        resolve: (author) => {
-          return books.filter((book) => book.author.id === author.id).length;
+        resolve: async (author) => {
+          const books = await BookService.getAll(author.id);
+          return books.length;
         },
       }),
     }),
@@ -24,16 +26,22 @@ export function bootstrapAuthor(builder: BuilderType) {
   const authorQueries = builder.queryFields((t) => ({
     author: t.field({
       type: AuthorRef,
-      resolve: () => AuthorService.getFirst(),
+      resolve: async () => {
+        return await AuthorService.getFirst();
+      },
     }),
 
     allAuthors: t.field({
       type: [AuthorRef],
-      resolve: () => AuthorService.getAll(),
+      resolve: async () => {
+        return await AuthorService.getAll();
+      },
     }),
 
     authorCount: t.int({
-      resolve: () => AuthorService.count(),
+      resolve: async () => {
+        return await AuthorService.count();
+      },
     }),
   }));
 
@@ -44,9 +52,15 @@ export function bootstrapAuthor(builder: BuilderType) {
         name: t.arg.string({ required: true }),
         born: t.arg.int({ required: true }),
       },
-      resolve: (_, args) => {
+      resolve: async (_, args) => {
         const { born, name } = args;
-        return AuthorService.create(name, born);
+        try {
+          return await AuthorService.create(name, born);
+        } catch (error) {
+          throw new GraphQLError("Author name must be unique", {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
       },
     }),
     editAuthor: t.field({
@@ -55,9 +69,15 @@ export function bootstrapAuthor(builder: BuilderType) {
         name: t.arg.string({ required: true }),
         setBornTo: t.arg.int({ required: true }),
       },
-      resolve: (_, args) => {
+      resolve: async (_, args) => {
         const { name, setBornTo } = args;
-        return AuthorService.edit(name, setBornTo);
+        const updatedAuthor = await AuthorService.edit(name, setBornTo);
+        if (!updatedAuthor) {
+          throw new GraphQLError("Author not found", {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        return updatedAuthor;
       },
     }),
   }));
