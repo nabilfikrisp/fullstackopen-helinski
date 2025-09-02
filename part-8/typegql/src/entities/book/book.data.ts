@@ -1,0 +1,51 @@
+export const books = [
+  {
+    title: "Clean Code",
+    published: 2008,
+    authorId: "afa51ab0-344d-11e9-a414-719c6709cf3e",
+    id: "afa5b6f4-344d-11e9-a414-719c6709cf3e",
+    genres: ["refactoring"],
+  },
+  {
+    title: "Agile software development",
+    published: 2002,
+    authorId: "afa51ab0-344d-11e9-a414-719c6709cf3e",
+    id: "afa5b6f5-344d-11e9-a414-719c6709cf3e",
+    genres: ["agile", "patterns", "design"],
+  },
+  {
+    title: "Refactoring, edition 2",
+    published: 2018,
+    authorId: "afa5b6f0-344d-11e9-a414-719c6709cf3e",
+    id: "afa5de00-344d-11e9-a414-719c6709cf3e",
+    genres: ["refactoring"],
+  },
+  {
+    title: "Refactoring to patterns",
+    published: 2008,
+    authorId: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
+    id: "afa5de01-344d-11e9-a414-719c6709cf3e",
+    genres: ["refactoring", "patterns"],
+  },
+  {
+    title: "Practical Object-Oriented Design, An Agile Primer Using Ruby",
+    published: 2012,
+    authorId: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
+    id: "afa5de02-344d-11e9-a414-719c6709cf3e",
+    genres: ["refactoring", "design"],
+  },
+  {
+    title: "Crime and punishment",
+    published: 1861,
+    authorId: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
+    id: "afa5de03-344d-11e9-a414-719c6709cf3e",
+    genres: ["classic", "crime"],
+  },
+  {
+    title: "Demons",
+    published: 1892,
+    authorId: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
+    id: "afa5de04-344d-11e9-a414-719c6709cf3e",
+    genres: ["classics", "revolution"],
+  },
+];
