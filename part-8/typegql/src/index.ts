@@ -8,8 +8,14 @@ import { Container } from "typedi";
 import { ErrorHandlerMiddleware } from "./middlewares/errorHandler";
 import path from "path";
 import { BookResolver } from "./entities/book/book.resolver";
+import ENV from "./utils/env";
+import { connectToDatabase } from "./utils/db";
 
 async function bootstrap() {
+  Container.set("ENV", ENV);
+
+  await connectToDatabase();
+
   const schema = await buildSchema({
     resolvers: [HelloResolver, AuthorResolver, BookResolver],
     container: Container,
@@ -21,7 +27,7 @@ async function bootstrap() {
   const server = new ApolloServer({ schema });
 
   const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 },
+    listen: { port: ENV.PORT },
   });
   console.log(`🚀 Server ready at ${url}`);
 }
