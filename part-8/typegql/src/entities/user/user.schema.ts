@@ -12,7 +12,16 @@ export class User {
   @prop({ required: true, minlength: 3, maxlength: 100 })
   public username!: string;
 
+  @prop({ required: true, minlength: 8 })
+  public password!: string;
+
   @Field(() => String)
   @prop({ required: true })
   public favoriteGenre!: string;
+}
+
+@ObjectType()
+export class Token {
+  @Field(() => String)
+  public accessToken!: string;
 }

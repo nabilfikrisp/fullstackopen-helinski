@@ -1,3 +1,4 @@
 ignoredBuiltDependencies:
   - '@apollo/protobufjs'
+  - bcrypt
   - esbuild

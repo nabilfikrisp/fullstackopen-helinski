@@ -1,6 +1,7 @@
 import { GraphQLError } from "graphql";
 import { ArgumentValidationError, MiddlewareFn } from "type-graphql";
 import { Error as MongooseError } from "mongoose";
+import jwt from "jsonwebtoken";
 
 export const ErrorHandlerMiddleware: MiddlewareFn = async ({}, next) => {
   try {
@@ -20,6 +21,12 @@ export const ErrorHandlerMiddleware: MiddlewareFn = async ({}, next) => {
       err.extensions?.code === "BAD_USER_INPUT"
     ) {
       return formatGraphQLError(err);
+    }
+    if (
+      err instanceof jwt.JsonWebTokenError ||
+      err instanceof jwt.TokenExpiredError
+    ) {
+      return formatJwtError(err);
     }
     return formatInternalError(err);
   }
@@ -75,6 +82,26 @@ function formatGraphQLError(err: GraphQLError) {
   return new GraphQLError(err.message, {
     extensions: {
       code: "BAD_USER_INPUT",
+      originalError: err.message,
+    },
+  });
+}
+
+/** Format JWT errors */
+export function formatJwtError(
+  err: jwt.JsonWebTokenError | jwt.TokenExpiredError
+) {
+  console.error(err, "JWT_ERROR");
+  let message = "Authentication error";
+  let code = "UNAUTHENTICATED";
+  if (err instanceof jwt.TokenExpiredError) {
+    message = "Token expired";
+  } else if (err instanceof jwt.JsonWebTokenError) {
+    message = "Invalid token";
+  }
+  return new GraphQLError(message, {
+    extensions: {
+      code,
       originalError: err.message,
     },
   });

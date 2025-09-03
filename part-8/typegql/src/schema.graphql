@@ -29,17 +29,29 @@ input CreateBookInput {
   title: String!
 }
 
+input CreateUserInput {
+  favoriteGenre: String!
+  password: String!
+  username: String!
+}
+
 input EditAuthorInput {
   born: Float
   id: String!
   name: String
 }
 
+input LoginInput {
+  password: String!
+  username: String!
+}
+
 type Mutation {
   createAuthor(input: CreateAuthorInput!): Author!
   createBook(input: CreateBookInput!): Book!
+  createUser(input: CreateUserInput!): User!
   editAuthor(input: EditAuthorInput!): Author
-  goodbye: String!
+  login(input: LoginInput!): Token!
 }
 
 type Query {
@@ -48,7 +60,16 @@ type Query {
   authors: [Author!]!
   bookCount: Int!
   books(authorId: String, genre: String): [Book!]!
-  hello: String!
-  helloArg(name: String!): String!
-  helloArgs(born: Int!, name: String!): String!
+  getUser(userId: String!): User
+  me: User
+}
+
+type Token {
+  accessToken: String!
+}
+
+type User {
+  _id: ID!
+  favoriteGenre: String!
+  username: String!
 }
