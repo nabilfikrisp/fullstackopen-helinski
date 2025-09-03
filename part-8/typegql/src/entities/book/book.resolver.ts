@@ -26,7 +26,7 @@ export class BookResolver {
 
   @FieldResolver((_returns) => Author)
   async author(@Root() book: Book) {
-    return this.authorService.getAuthorById(book.authorId);
+    return this.authorService.getAuthorById(book.author.toString());
   }
 
   @Query((_returns) => Int)

@@ -1,53 +1,49 @@
 import { Service } from "typedi";
-import { authors } from "./author.data";
-import { Author } from "./author.schema";
+import { Author, AuthorModel } from "./author.schema";
 import { CreateAuthorInput, EditAuthorInput } from "./author.input";
 
 @Service()
 export class AuthorService {
-  private generateId(): string {
-    return `author-${Math.random().toString(36).substring(2, 9)}`;
+  public async getAuthorById(id: string): Promise<Author | null> {
+    const existingAuthor = await AuthorModel.findById(id);
+    return existingAuthor || null;
   }
 
-  public getAuthorById(id: string): Author | null {
-    return authors.find((author) => author.id === id) || null;
+  public async getAllAuthors(): Promise<Author[]> {
+    return AuthorModel.find();
   }
 
-  public getAllAuthors(): Author[] {
-    return authors;
+  public async getAuthorCount(): Promise<number> {
+    return AuthorModel.countDocuments();
   }
 
-  public getAuthorCount(): number {
-    return authors.length;
+  public async getAuthorByName(name: string): Promise<Author | null> {
+    return AuthorModel.findOne({ name });
   }
 
-  public getAuthorByName(name: string): Author | null {
-    return authors.find((author) => author.name === name) || null;
-  }
-
-  public createAuthor(params: CreateAuthorInput): Author {
-    const author: Author = {
-      id: this.generateId(),
+  public async createAuthor(params: CreateAuthorInput): Promise<Author> {
+    const author = new AuthorModel({
       name: params.name,
       born: params.born,
-    };
-    authors.push(author);
-    return author;
+    });
+    await author.save();
+    return author.toObject();
   }
 
-  public editAuthor(params: EditAuthorInput): Author | null {
-    const author = this.getAuthorById(params.id);
-    if (!author) {
+  public async editAuthor(params: EditAuthorInput): Promise<Author | null> {
+    const updatedAuthor = await AuthorModel.findByIdAndUpdate(
+      params.id,
+      {
+        name: params.name,
+        born: params.born,
+      },
+      { new: true }
+    );
+
+    if (!updatedAuthor) {
       return null;
     }
 
-    if (params.name) {
-      author.name = params.name;
-    }
-    if (params.born) {
-      author.born = params.born;
-    }
-
-    return author;
+    return updatedAuthor.toObject();
   }
 }

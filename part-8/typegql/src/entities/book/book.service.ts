@@ -1,63 +1,53 @@
 import { Service } from "typedi";
-import { books } from "./book.data";
-import { Book } from "./book.schema";
+import { Book, BookModel } from "./book.schema";
 import { BookArgs } from "./book.arg";
 import { CreateBookInput } from "./book.input";
 import { AuthorService } from "../author/author.service";
-
 @Service()
 export class BookService {
   constructor(private authorService: AuthorService) {}
 
-  private generateId(): string {
-    return `book-${Math.random().toString(36).substring(2, 9)}`;
+  public async getBookCountByAuthorId(authorId: string): Promise<number> {
+    return await BookModel.find({
+      author: authorId,
+    }).countDocuments();
   }
 
-  public getBookCountByAuthorId(authorId: string): number {
-    const filteredBooks = books.filter((book) => book.authorId === authorId);
-    return filteredBooks.length;
+  public async getBookCount(): Promise<number> {
+    return await BookModel.countDocuments();
   }
 
-  public getBookCount(): number {
-    return books.length;
-  }
-
-  public getAllBooks(args: BookArgs): Book[] {
+  public async getAllBooks(args: BookArgs): Promise<Book[]> {
     const { authorId, genre } = args;
-    let filteredBooks = books;
+    const query: any = {};
 
     if (authorId) {
-      filteredBooks = filteredBooks.filter(
-        (book) => book.authorId === authorId
-      );
+      query.author = authorId;
     }
 
     if (genre) {
-      filteredBooks = filteredBooks.filter((book) =>
-        book.genres.includes(genre)
-      );
+      query.genres = { $in: [genre] };
     }
 
-    return filteredBooks;
+    return await BookModel.find(query).lean();
   }
 
-  public createBook(input: CreateBookInput): Book {
+  public async createBook(input: CreateBookInput): Promise<Book> {
     const { title, authorName, genres, published } = input;
 
-    let author = this.authorService.getAuthorByName(authorName);
+    let author = await this.authorService.getAuthorByName(authorName);
 
     if (!author) {
-      author = this.authorService.createAuthor({ name: authorName });
+      author = await this.authorService.createAuthor({ name: authorName });
     }
 
-    const newBook: Book = {
-      id: this.generateId(),
+    const newBook = new BookModel({
       title,
       published,
-      authorId: author.id,
+      author: author._id,
       genres: genres || [],
-    };
-    books.push(newBook);
-    return newBook;
+    });
+    await newBook.save();
+    return newBook.toObject();
   }
 }

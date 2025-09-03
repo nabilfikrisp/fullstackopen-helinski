@@ -1,19 +1,29 @@
+import { getModelForClass, prop, Ref } from "@typegoose/typegoose";
 import { Field, ID, ObjectType } from "type-graphql";
+import { v4 as uuidv4 } from "uuid";
+import { Author } from "../author/author.schema";
 
 @ObjectType()
 export class Book {
   @Field(() => ID)
-  id!: string;
+  @prop({ required: true, default: () => uuidv4() })
+  public _id!: string;
 
   @Field(() => String)
-  title!: string;
+  @prop({ required: true, unique: true, minlength: 5, type: String })
+  public title!: string;
 
   @Field(() => Number)
-  published!: number;
+  @prop({ type: Number })
+  public published!: number;
 
-  @Field(() => String)
-  authorId!: string;
+  @Field(() => Author)
+  @prop({ ref: () => Author, type: String, required: true })
+  public author!: Ref<Author>;
 
   @Field(() => [String])
-  genres!: string[];
+  @prop({ type: [String] })
+  public genres!: string[];
 }
+
+export const BookModel = getModelForClass(Book);

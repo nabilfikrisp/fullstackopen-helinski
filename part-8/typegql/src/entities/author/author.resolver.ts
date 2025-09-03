@@ -1,32 +1,32 @@
 import {
   Arg,
-  FieldResolver,
+  // FieldResolver,
   ID,
   Int,
   Mutation,
   Query,
   Resolver,
-  Root,
+  // Root,
 } from "type-graphql";
 import { Author } from "./author.schema";
 import { AuthorService } from "./author.service";
 import { Service } from "typedi";
 import { CreateAuthorInput, EditAuthorInput } from "./author.input";
-import { BookService } from "../book/book.service";
+// import { BookService } from "../book/book.service";
 
 @Service()
 @Resolver((_of) => Author)
 export class AuthorResolver {
   constructor(
-    private authorService: AuthorService,
-    private bookService: BookService
-  ) {}
+    private authorService: AuthorService
+  ) // private bookService: BookService
+  {}
 
   //computedField
-  @FieldResolver((_returns) => Int)
-  async bookCount(@Root() author: Author) {
-    return this.bookService.getBookCountByAuthorId(author.id);
-  }
+  // @FieldResolver((_returns) => Int)
+  // async bookCount(@Root() author: Author) {
+  //   return this.bookService.getBookCountByAuthorId(author._id);
+  // }
 
   @Query((_returns) => Author, { nullable: true })
   async author(@Arg("id", () => ID) id: string) {

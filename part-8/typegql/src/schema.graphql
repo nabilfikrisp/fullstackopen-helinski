@@ -4,17 +4,15 @@
 # -----------------------------------------------
 
 type Author {
-  bookCount: Int!
+  _id: ID!
   born: Int
-  id: ID!
   name: String!
 }
 
 type Book {
+  _id: ID!
   author: Author!
-  authorId: String!
   genres: [String!]!
-  id: ID!
   published: Float!
   title: String!
 }
