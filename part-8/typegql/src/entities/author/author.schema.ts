@@ -1,4 +1,4 @@
-import { getModelForClass, prop } from "@typegoose/typegoose";
+import { prop } from "@typegoose/typegoose";
 import { Field, ID, Int, ObjectType } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
 
@@ -16,5 +16,3 @@ export class Author {
   @prop({ type: Number })
   public born?: number;
 }
-
-export const AuthorModel = getModelForClass(Author);

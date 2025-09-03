@@ -1,6 +1,7 @@
 import { Service } from "typedi";
-import { Author, AuthorModel } from "./author.schema";
+import { Author } from "./author.schema";
 import { CreateAuthorInput, EditAuthorInput } from "./author.input";
+import { AuthorModel } from "../../models";
 
 @Service()
 export class AuthorService {

@@ -1,4 +1,4 @@
-import { getModelForClass, prop, Ref } from "@typegoose/typegoose";
+import { prop, Ref } from "@typegoose/typegoose";
 import { Field, ID, ObjectType } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
 import { Author } from "../author/author.schema";
@@ -25,5 +25,3 @@ export class Book {
   @prop({ type: [String] })
   public genres!: string[];
 }
-
-export const BookModel = getModelForClass(Book);
