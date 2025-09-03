@@ -30,6 +30,10 @@ async function bootstrap() {
   const { url } = await startStandaloneServer(server, {
     listen: { port: ENV.PORT },
     context: async ({ req }): Promise<Context> => {
+      if (!req.headers.authorization) {
+        return { currentUser: null };
+      }
+
       const currentUser = await getCurrentUser(req.headers.authorization);
       return { currentUser };
     },

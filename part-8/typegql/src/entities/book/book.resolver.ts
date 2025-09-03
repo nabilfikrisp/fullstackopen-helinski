@@ -7,6 +7,7 @@ import {
   Query,
   Resolver,
   Root,
+  Ctx,
 } from "type-graphql";
 import { Service } from "typedi";
 import { Book } from "./book.schema";
@@ -15,6 +16,8 @@ import { AuthorService } from "../author/author.service";
 import { BookService } from "./book.service";
 import { BookArgs } from "./book.arg";
 import { CreateBookInput } from "./book.input";
+import { Context } from "../../utils/context";
+import { throwUnauthorizedError } from "../../utils/errors";
 
 @Service()
 @Resolver(Book)
@@ -40,7 +43,8 @@ export class BookResolver {
   }
 
   @Mutation((_returns) => Book)
-  async createBook(@Arg("input") input: CreateBookInput) {
+  async createBook(@Arg("input") input: CreateBookInput, @Ctx() ctx: Context) {
+    if (!ctx.currentUser) throwUnauthorizedError();
     return this.bookService.createBook(input);
   }
 }

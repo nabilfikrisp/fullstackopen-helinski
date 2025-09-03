@@ -5,6 +5,7 @@
 
 type Author {
   _id: ID!
+  bookCount: Int!
   born: Int
   name: String!
 }

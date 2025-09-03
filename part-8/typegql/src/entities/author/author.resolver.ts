@@ -7,26 +7,32 @@ import {
   Query,
   Resolver,
   // Root,
+  Ctx,
+  FieldResolver,
+  Root,
 } from "type-graphql";
 import { Author } from "./author.schema";
 import { AuthorService } from "./author.service";
 import { Service } from "typedi";
 import { CreateAuthorInput, EditAuthorInput } from "./author.input";
-// import { BookService } from "../book/book.service";
+import { Context } from "../../utils/context";
+import { BookService } from "../book/book.service";
+import { throwUnauthorizedError } from "../../utils/errors";
 
 @Service()
 @Resolver((_of) => Author)
 export class AuthorResolver {
   constructor(
-    private authorService: AuthorService
-  ) // private bookService: BookService
-  {}
+    private authorService: AuthorService,
+    private bookService: BookService
+  ) {}
 
-  //computedField
-  // @FieldResolver((_returns) => Int)
-  // async bookCount(@Root() author: Author) {
-  //   return this.bookService.getBookCountByAuthorId(author._id);
-  // }
+  @FieldResolver((_returns) => Int)
+  async bookCount(@Root() author: Author) {
+    // hack
+    const authorId = (author as any)._doc._id;
+    return this.bookService.getBookCountByAuthorId(authorId);
+  }
 
   @Query((_returns) => Author, { nullable: true })
   async author(@Arg("id", () => ID) id: string) {
@@ -49,7 +55,8 @@ export class AuthorResolver {
   }
 
   @Mutation((_returns) => Author, { nullable: true })
-  async editAuthor(@Arg("input") input: EditAuthorInput) {
+  async editAuthor(@Arg("input") input: EditAuthorInput, @Ctx() ctx: Context) {
+    if (!ctx.currentUser) throwUnauthorizedError();
     return this.authorService.editAuthor(input);
   }
 }

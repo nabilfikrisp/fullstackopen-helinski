@@ -23,6 +23,12 @@ export const ErrorHandlerMiddleware: MiddlewareFn = async ({}, next) => {
       return formatGraphQLError(err);
     }
     if (
+      err instanceof GraphQLError &&
+      err.extensions?.code === "UNAUTHENTICATED"
+    ) {
+      return formatUnauthenticatedError(err);
+    }
+    if (
       err instanceof jwt.JsonWebTokenError ||
       err instanceof jwt.TokenExpiredError
     ) {
@@ -82,6 +88,16 @@ function formatGraphQLError(err: GraphQLError) {
   return new GraphQLError(err.message, {
     extensions: {
       code: "BAD_USER_INPUT",
+      originalError: err.message,
+    },
+  });
+}
+
+/** Format UNAUTHENTICATED errors */
+function formatUnauthenticatedError(err: GraphQLError) {
+  return new GraphQLError(err.message, {
+    extensions: {
+      code: "UNAUTHENTICATED",
       originalError: err.message,
     },
   });
